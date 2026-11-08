@@ -1,0 +1,11 @@
+{
+  "name": "trailer-max",
+  "extends": "balanced",
+  "note": "example, validate on your hardware",
+  "target_hardware": "example: offline capture, validate on your hardware",
+  "cvars": {
+    "sg.GlobalIlluminationQuality": 4,
+    "sg.ShadowQuality": 4,
+    "r.Streaming.PoolSize": 3000
+  }
+}
