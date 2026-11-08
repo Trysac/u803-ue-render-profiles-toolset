@@ -1,0 +1,14 @@
+{
+  "name": "lumen-lite-6gb",
+  "extends": "balanced",
+  "note": "example, validate on your hardware",
+  "target_hardware": "example: GPU with 6 GB of VRAM, validate on your hardware",
+  "cvars": {
+    "sg.GlobalIlluminationQuality": 1,
+    "sg.ShadowQuality": 1,
+    "r.Lumen.Reflections.Allow": 0,
+    "r.Lumen.TraceMeshSDFs": 0,
+    "r.ScreenPercentage": 75,
+    "r.Streaming.PoolSize": 500
+  }
+}

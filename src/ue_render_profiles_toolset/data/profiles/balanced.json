@@ -1,0 +1,17 @@
+{
+  "name": "balanced",
+  "note": "example, validate on your hardware",
+  "target_hardware": "example, validate on your hardware",
+  "cvars": {
+    "sg.GlobalIlluminationQuality": 2,
+    "sg.ShadowQuality": 2,
+    "r.Lumen.DiffuseIndirect.Allow": 1,
+    "r.Lumen.Reflections.Allow": 1,
+    "r.Lumen.TraceMeshSDFs": 1,
+    "r.Shadow.Virtual.Enable": 1,
+    "r.AntiAliasingMethod": 4,
+    "r.ScreenPercentage": 100,
+    "r.Fog": 1,
+    "r.Streaming.PoolSize": 1000
+  }
+}
