@@ -1,6 +1,6 @@
 # Pure core with whitelisted numeric commands and snapshot-based revert
 
-Status: accepted (generated, pending human review)
+Status: accepted (generated, pending human review); snapshot persistence amended by ADR 0003
 
 ## Context
 

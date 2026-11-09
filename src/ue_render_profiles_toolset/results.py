@@ -20,6 +20,7 @@ class ProfileInfo:
     note: str
     target_hardware: str
     cvar_count: int
+    source: str = "builtin"
 
 
 @dataclass(frozen=True)
@@ -45,10 +46,14 @@ class DescribeProfileResult:
 
 @dataclass(frozen=True)
 class SnapshotResult:
-    """Result of ``snapshot_current``: the live value of every whitelisted CVar."""
+    """Result of ``snapshot_current``: the live value of every whitelisted CVar.
+
+    ``missing`` names catalog CVars that could not be read in this engine version.
+    """
 
     summary: str
     values: dict[str, Number]
+    missing: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -59,6 +64,7 @@ class DiffResult:
     left: str
     right: str
     entries: tuple[DiffEntry, ...]
+    missing: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -74,6 +80,7 @@ class ApplyResult:
     mismatched: tuple[str, ...]
     mismatch_details: tuple[Mismatch, ...]
     snapshot_id: int | None
+    missing_cvars: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)

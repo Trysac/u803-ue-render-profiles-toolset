@@ -1,7 +1,7 @@
 """Versioned Unreal Engine render profiles: pure core and Unreal MCP toolset adapter.
 
 The pure core never imports ``unreal``; the adapter functions take the ``unreal`` module (or a
-fake) as their first argument.
+fake) as their first argument. ``mcp`` is the agent-facing layer used by the Unreal plugin.
 """
 
 from __future__ import annotations
@@ -12,6 +12,8 @@ from ue_render_profiles_toolset.adapter import (
     diff_profiles,
     export_scalability_ini,
     list_profiles,
+    load_project_profiles,
+    load_registry,
     revert_last,
     snapshot_current,
 )
@@ -47,10 +49,12 @@ __all__ = [
     "list_profiles",
     "load_catalog",
     "load_profiles",
+    "load_project_profiles",
+    "load_registry",
     "resolve_profile",
     "revert_last",
     "snapshot_current",
     "validate_profile",
 ]
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"

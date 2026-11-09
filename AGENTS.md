@@ -21,7 +21,12 @@ documentation manifest (`docs-manifest.json`), gitleaks. It stops at the first f
 
 | Path | Content |
 |---|---|
-| `src/ue_render_profiles_toolset/` | The package. Public API is whatever `__init__.py` exports in `__all__`. |
+| `src/ue_render_profiles_toolset/` | The package. Public API is whatever `__init__.py` exports in `__all__`. `mcp.py` is the agent-facing layer; `session.py` keeps snapshots across MCP calls. |
+| `src/ue_render_profiles_toolset/data/` | Packaged CVar catalog and example profiles (shipped in the plugin zip). |
+| `plugin/RenderProfilesToolset/` | The Unreal plugin: `.uplugin` and the toolset shell in `Content/Python/` (no logic). |
+| `tools/build_plugin.py` | Builds `dist/RenderProfilesToolset-<version>.zip` with the vendored package. |
+| `skill/SKILL.md` | Optional Claude Code skill for agents that use the toolset. |
+| `tests/ue_smoke.py` | In-editor smoke test; run by hand inside Unreal, never by pytest. |
 | `tests/` | pytest tests, one file per public module, exercising the public API. |
 | `scripts/check.py` | The single definition of the quality gates. |
 | `docs/` | Architecture, decisions (ADRs), testing, security, project record, stack. |

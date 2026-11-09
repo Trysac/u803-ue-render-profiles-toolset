@@ -11,15 +11,18 @@
 - **Writes outside the project**: `export_scalability_ini` writes only when `write=True` and `dry_run=False`, only as `DefaultScalability.ini`, and only inside a folder named `Config` that exists. Other paths raise `ProfileError`.
 - **Unbounded input**: JSON input is size-limited, the catalog is capped at 512 entries, the profile registry at 64 profiles, and `extends` chains have a depth limit. Error messages are clipped to 200 characters.
 - **Silent misconfiguration**: read-back after apply lists any CVar whose value differs from the request under `mismatched`.
+- **Project profiles and the session file**: `Config/RenderProfiles/*.json` and `Saved/RenderProfilesToolset/session.json` go through the same JSON size limits and validation as the packaged profiles; a tampered file can still only produce whitelisted `<cvar> <number>` commands. An unreadable session file is ignored (reported as `state_warning`) and replaced on the next save.
+- **Errors reaching the agent**: the `mcp` layer returns every `ProfileError`, `OSError` and API error as `{"summary": "error: ...", "error": {...}}` instead of raising inside the editor.
 - **Unsafe deserialization**: profiles and the catalog are parsed as JSON only. No `eval`, `exec` or pickle is used.
 
 ### Not defended
 
 - **A trusted caller**: whoever holds the `ue` object can run any console command directly. This library does not restrict the caller.
-- **Persistence of rollback data**: snapshots are kept in memory (at most 16 per store) and are lost when the process exits. A revert after a restart is not possible.
+- **Persistence of rollback data**: snapshots are kept in memory (at most 16) and, through the `mcp` layer, mirrored to `Saved/RenderProfilesToolset/session.json`. Console values reset when the editor restarts while the file persists, so a revert after a restart re-sends recorded values that may no longer be what the user expects.
+- **Missing CVars that read as 0**: a read that fails is reported as missing, but if the engine returns 0 for an unknown CVar instead of failing, the CVar shows up only as `mismatched` after a real apply.
 - **Engine-side effects**: the library cannot tell whether a written CVar causes a crash, a driver fault or a performance regression on a given GPU. Read-only and startup CVars are skipped and reported, not verified.
 - **Catalog accuracy**: the `source` links point to section-level Epic documentation pages that have not been confirmed. The `scalability_group` mapping is declared by this catalog and must be checked against the project's `BaseScalability.ini`.
-- **Behaviour inside Unreal**: the Unreal calls were exercised only against a fake console. The adapter has not been run in the editor.
+- **Behaviour inside Unreal**: the Unreal calls and the plugin shell were exercised only against fakes in CI. They have not been run in the editor yet (see `docs/TESTING.md`).
 
 ## Publishing
 

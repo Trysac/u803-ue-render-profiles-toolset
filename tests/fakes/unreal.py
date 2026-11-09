@@ -85,8 +85,14 @@ class _FakeEditorSubsystem:
 
 
 class _FakePaths:
-    def __init__(self, config_dir: str | None) -> None:
+    def __init__(self, config_dir: str | None, saved_dir: str | None = None) -> None:
         self._config_dir = config_dir
+        self._saved_dir = saved_dir
+
+    def project_saved_dir(self) -> str:
+        if self._saved_dir is None:
+            raise RuntimeError("no project saved dir configured")
+        return self._saved_dir
 
     def project_config_dir(self) -> str:
         if self._config_dir is None:
@@ -97,11 +103,16 @@ class _FakePaths:
 class FakeUnreal:
     """Stands in for the ``unreal`` module."""
 
-    def __init__(self, console: FakeConsole, config_dir: str | None) -> None:
+    def __init__(
+        self,
+        console: FakeConsole,
+        config_dir: str | None,
+        saved_dir: str | None = None,
+    ) -> None:
         self.console = console
         self.SystemLibrary = _FakeSystemLibrary(console)
         self.UnrealEditorSubsystem = _FakeEditorSubsystem
-        self.Paths = _FakePaths(config_dir)
+        self.Paths = _FakePaths(config_dir, saved_dir)
 
     def get_editor_subsystem(self, subsystem_class: Any) -> Any:
         return subsystem_class()
@@ -113,12 +124,19 @@ def make_fake(
     forced: Mapping[str, Any] | None = None,
     config_dir: str | None = None,
     group_effects: Mapping[str, Mapping[str, Any]] | None = None,
+    saved_dir: str | None = None,
+    absent: Iterable[str] = (),
 ) -> FakeUnreal:
-    """Build a fake with one entry per catalog CVar (ints 1, floats 100.0 unless overridden)."""
+    """Build a fake with one entry per catalog CVar (ints 1, floats 100.0 unless overridden).
+
+    ``absent`` CVars are removed from the table, as if this engine version did not expose them.
+    """
     table: dict[str, Any] = {}
     for name, spec in load_catalog().cvars.items():
         table[name] = 1 if spec.type == "int" else 100.0
     table.update(values or {})
+    for name in absent:
+        table.pop(name, None)
     only = DEFAULT_READ_ONLY if read_only is None else read_only
     console = FakeConsole(table, only, forced or {}, group_effects)
-    return FakeUnreal(console, config_dir)
+    return FakeUnreal(console, config_dir, saved_dir)

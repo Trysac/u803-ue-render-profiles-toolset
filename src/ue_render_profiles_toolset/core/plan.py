@@ -4,11 +4,16 @@ from __future__ import annotations
 
 import math
 from collections import deque
-from collections.abc import Mapping
+from collections.abc import Collection, Mapping
 from dataclasses import dataclass
 
 from ue_render_profiles_toolset.core.catalog import Catalog, CVarSpec
-from ue_render_profiles_toolset.core.profile import Number, Profile, is_number
+from ue_render_profiles_toolset.core.profile import (
+    Number,
+    Profile,
+    is_cvar_name,
+    is_number,
+)
 from ue_render_profiles_toolset.errors import (
     CODE_INVALID_PROFILE,
     CODE_NOTHING_TO_REVERT,
@@ -17,6 +22,7 @@ from ue_render_profiles_toolset.errors import (
 )
 
 DEFAULT_MAX_SNAPSHOTS = 16
+STORE_FORMAT_VERSION = 1
 
 
 @dataclass(frozen=True)
@@ -31,11 +37,15 @@ class PlannedCommand:
 
 @dataclass(frozen=True)
 class ApplyPlan:
-    """Ordered commands plus the CVars skipped because they need a restart."""
+    """Ordered commands plus the CVars skipped because they need a restart or are missing.
+
+    ``skipped_missing`` names CVars of the profile that this engine version does not expose.
+    """
 
     profile: str
     commands: tuple[PlannedCommand, ...]
     skipped_restart: tuple[str, ...]
+    skipped_missing: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -105,19 +115,28 @@ def build_apply_plan(
     profile: Profile,
     catalog: Catalog,
     current: Mapping[str, Number],
+    available: Collection[str] | None = None,
 ) -> ApplyPlan:
-    """Plan the commands that apply a resolved profile."""
+    """Plan the commands that apply a resolved profile.
+
+    When ``available`` is given, CVars of the profile not in it (absent from this engine
+    version) get no command and are listed in ``skipped_missing`` instead of failing silently.
+    """
     commands: list[PlannedCommand] = []
     skipped: list[str] = []
+    missing: list[str] = []
     for name in sorted(profile.cvars, key=_order):
         spec = require_spec(catalog, name)
         if spec.requires_restart:
             skipped.append(name)
             continue
+        if available is not None and name not in available:
+            missing.append(name)
+            continue
         value = coerce_value(spec, profile.cvars[name])
         text = build_command(catalog, name, value)
         commands.append(PlannedCommand(name, current.get(name), value, text))
-    return ApplyPlan(profile.name, tuple(commands), tuple(skipped))
+    return ApplyPlan(profile.name, tuple(commands), tuple(skipped), tuple(missing))
 
 
 def build_revert_plan(
@@ -192,5 +211,61 @@ class SnapshotStore:
         """Drop every snapshot."""
         self._items.clear()
 
+    def to_dict(self) -> dict[str, object]:
+        """Return the store as plain JSON-compatible data (oldest snapshot first)."""
+        return {
+            "version": STORE_FORMAT_VERSION,
+            "next_id": self._next_id,
+            "snapshots": [
+                {
+                    "snapshot_id": item.snapshot_id,
+                    "profile": item.profile,
+                    "values": dict(item.values),
+                    "touched": list(item.touched),
+                }
+                for item in self._items
+            ],
+        }
+
+    @classmethod
+    def from_dict(cls, data: object, max_entries: int = DEFAULT_MAX_SNAPSHOTS) -> SnapshotStore:
+        """Rebuild a store saved by ``to_dict``; raise ``invalid_profile`` on malformed data."""
+        if not isinstance(data, dict) or data.get("version") != STORE_FORMAT_VERSION:
+            raise _state_error("expected an object with version 1")
+        next_id = data.get("next_id")
+        raw_items = data.get("snapshots")
+        if isinstance(next_id, bool) or not isinstance(next_id, int) or next_id < 1:
+            raise _state_error("next_id must be a positive integer")
+        if not isinstance(raw_items, list):
+            raise _state_error("snapshots must be a list")
+        store = cls(max_entries)
+        for raw in raw_items:
+            store._items.append(_snapshot_from_dict(raw))
+        store._next_id = max([next_id, *(item.snapshot_id + 1 for item in store._items)])
+        return store
+
     def __len__(self) -> int:
         return len(self._items)
+
+
+def _state_error(message: str) -> ProfileError:
+    return ProfileError(CODE_INVALID_PROFILE, f"snapshot state: {message}")
+
+
+def _snapshot_from_dict(raw: object) -> Snapshot:
+    if not isinstance(raw, dict):
+        raise _state_error("each snapshot must be an object")
+    snapshot_id = raw.get("snapshot_id")
+    profile = raw.get("profile")
+    values = raw.get("values")
+    touched = raw.get("touched")
+    if isinstance(snapshot_id, bool) or not isinstance(snapshot_id, int) or snapshot_id < 1:
+        raise _state_error("snapshot_id must be a positive integer")
+    if not isinstance(profile, str) or not isinstance(values, dict):
+        raise _state_error("profile must be a string and values an object")
+    if not isinstance(touched, list) or not all(is_cvar_name(item) for item in touched):
+        raise _state_error("touched must be a list of cvar names")
+    for name, value in values.items():
+        if not is_cvar_name(name) or not is_number(value):
+            raise _state_error(f"invalid value for {clip(str(name), 60)}")
+    return Snapshot(snapshot_id, clip(profile, 64), dict(values), tuple(touched))
