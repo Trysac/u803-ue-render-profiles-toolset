@@ -1,13 +1,14 @@
 # ue-render-profiles-toolset
 
-> Versioned Unreal Engine render profiles (CVars and scalability): a pure core with profile resolution, catalog validation, diff, apply and revert plans, and a thin Unreal adapter. Python package `trysac-ue-render-profiles-toolset`, import name `ue_render_profiles_toolset`, MIT licensed, Python >= 3.11, no runtime dependencies. Nothing was tested inside Unreal; the adapter was tested against a fake console.
+> Versioned Unreal Engine render profiles (CVars and scalability): a pure core with profile resolution, catalog validation, diff, apply and revert plans, and a thin Unreal adapter. Python package `trysac-ue-render-profiles-toolset`, import name `ue_render_profiles_toolset`, MIT licensed, Python >= 3.11, no runtime dependencies. Ships as the Python-only Unreal MCP plugin `RenderProfilesToolset` (toolset `RenderProfileTools`). Tested in CI against fakes; not yet verified inside Unreal.
 
 ## Docs
 
 - [README](README.md): problem, install, usage example, public API
 - [Architecture](docs/ARCHITECTURE.md): shape of the package and its public API
 - [Security](docs/SECURITY.md): threat model, defended and not defended
-- [Testing](docs/TESTING.md): how to run and extend the tests
+- [Testing](docs/TESTING.md): how to run and extend the tests, in-editor acceptance steps
+- [Agent usage](docs/AGENT_USAGE.md): `call_tool` examples and expected responses
 
 ## Optional
 

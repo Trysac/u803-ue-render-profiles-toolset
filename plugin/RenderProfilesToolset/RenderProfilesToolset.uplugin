@@ -1,0 +1,20 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "0.2.0",
+	"FriendlyName": "Render Profiles Toolset (Unreal MCP)",
+	"Description": "Unreal MCP toolset: list, diff, apply and revert versioned render profiles (whitelisted CVars and scalability groups) and export DefaultScalability.ini. Python only, no compilation.",
+	"Category": "Editor",
+	"CreatedBy": "Miguel Gomez (Trysac)",
+	"CreatedByURL": "https://github.com/Trysac/u803-ue-render-profiles-toolset",
+	"DocsURL": "https://github.com/Trysac/u803-ue-render-profiles-toolset#readme",
+	"EngineVersion": "5.8.0",
+	"CanContainContent": true,
+	"IsBetaVersion": true,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Plugins": [
+		{ "Name": "PythonScriptPlugin", "Enabled": true },
+		{ "Name": "ToolsetRegistry", "Enabled": true }
+	]
+}
