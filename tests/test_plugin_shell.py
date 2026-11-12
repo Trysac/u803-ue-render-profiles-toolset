@@ -68,7 +68,9 @@ def test_every_mcp_function_is_a_documented_tool(shell: Any) -> None:
     assert public == tools
     for name in tools:
         fn = getattr(toolset, name)
-        assert getattr(fn, "is_tool", False), name
+        assert getattr(vars(toolset)[name], "is_tool", False), (
+            name
+        )  # tool_call wraps the staticmethod (Epic order)
         doc = inspect.getdoc(fn) or ""
         params = inspect.signature(fn).parameters
         assert "Args:" in doc or not params, name
