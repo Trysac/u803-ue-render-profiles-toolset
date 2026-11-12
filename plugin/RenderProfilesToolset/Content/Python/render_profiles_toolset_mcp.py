@@ -25,8 +25,8 @@ class RenderProfileTools(unreal.ToolsetDefinition):
     reported, not sent.
     """
 
-    @staticmethod
     @toolset_registry.tool_call
+    @staticmethod
     def list_profiles() -> str:
         """List every available render profile (read-only).
 
@@ -36,8 +36,8 @@ class RenderProfileTools(unreal.ToolsetDefinition):
         """
         return mcp.list_profiles(unreal)
 
-    @staticmethod
     @toolset_registry.tool_call
+    @staticmethod
     def describe_profile(name: str) -> str:
         """Resolve one profile through its extends chain and validate it (read-only).
 
@@ -50,8 +50,8 @@ class RenderProfileTools(unreal.ToolsetDefinition):
         """
         return mcp.describe_profile(unreal, name)
 
-    @staticmethod
     @toolset_registry.tool_call
+    @staticmethod
     def snapshot_current(name: str = "") -> str:
         """Read the live value of every whitelisted CVar.
 
@@ -66,8 +66,8 @@ class RenderProfileTools(unreal.ToolsetDefinition):
         """
         return mcp.snapshot_current(unreal, name)
 
-    @staticmethod
     @toolset_registry.tool_call
+    @staticmethod
     def diff_profiles(left: str, right: str = "current") -> str:
         """Compare two profiles CVar by CVar, with the catalog impact note (read-only).
 
@@ -80,8 +80,8 @@ class RenderProfileTools(unreal.ToolsetDefinition):
         """
         return mcp.diff_profiles(unreal, left, right)
 
-    @staticmethod
     @toolset_registry.tool_call
+    @staticmethod
     def apply_profile(name: str, dry_run: bool = True) -> str:
         """Apply a profile to the running editor with whitelisted console commands.
 
@@ -98,8 +98,8 @@ class RenderProfileTools(unreal.ToolsetDefinition):
         """
         return mcp.apply_profile(unreal, name, dry_run)
 
-    @staticmethod
     @toolset_registry.tool_call
+    @staticmethod
     def revert_last(dry_run: bool = True) -> str:
         """Restore the CVar values recorded before the last real apply_profile.
 
@@ -112,8 +112,8 @@ class RenderProfileTools(unreal.ToolsetDefinition):
         """
         return mcp.revert_last(unreal, dry_run)
 
-    @staticmethod
     @toolset_registry.tool_call
+    @staticmethod
     def export_scalability_ini(levels_json: str, write: bool = False, dry_run: bool = True) -> str:
         """Render DefaultScalability.ini that maps quality levels to profiles.
 
