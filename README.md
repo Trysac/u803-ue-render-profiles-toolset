@@ -1,7 +1,6 @@
 # ue-render-profiles-toolset
 
-[![PyPI version](https://img.shields.io/pypi/v/trysac-ue-render-profiles-toolset)](https://pypi.org/project/trysac-ue-render-profiles-toolset/)
-[![License: MIT](https://img.shields.io/pypi/l/trysac-ue-render-profiles-toolset)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![CI](https://github.com/Trysac/u803-ue-render-profiles-toolset/actions/workflows/ci.yml/badge.svg)](https://github.com/Trysac/u803-ue-render-profiles-toolset/actions/workflows/ci.yml)
 
 Versioned Unreal Engine render profiles (CVars and scalability): a pure core with profile resolution, catalog validation, diff, apply and revert plans, and a thin adapter for the Unreal Python API.
